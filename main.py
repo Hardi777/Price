@@ -3,23 +3,23 @@ import requests
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler
 
-# Замените 'YOUR_TOKEN' на токен вашего бота
+# Г‡Г Г¬ГҐГ­ГЁГІГҐ 'YOUR_TOKEN' Г­Г  ГІГ®ГЄГҐГ­ ГўГ ГёГҐГЈГ® ГЎГ®ГІГ 
 TOKEN = 'YOUR_TOKEN'
 
-# ID чата для проверки
+# ID Г·Г ГІГ  Г¤Г«Гї ГЇГ°Г®ГўГҐГ°ГЄГЁ
 ADMIN_CHAT_ID = 1111
 
-# URL файлов в репозитории GitHub
-PRICE_AB_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/priceAB.json'
+# URL ГґГ Г©Г«Г®Гў Гў Г°ГҐГЇГ®Г§ГЁГІГ®Г°ГЁГЁ GitHub
+PRICE_AB_URL = 'https://github.com/Hardi777/Price/blob/d4d9de5c43d29a08f705fc761507398556a7e613/pricesAB.json'
 PRICE_CR_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/priceCR.json'
 
-# Храним данные из файлов в словарях
+# Г•Г°Г Г­ГЁГ¬ Г¤Г Г­Г­Г»ГҐ ГЁГ§ ГґГ Г©Г«Г®Гў Гў Г±Г«Г®ГўГ Г°ГїГµ
 price_ab = {}
 price_cr = {}
 current_mode = None
 pending_addition = {}
 
-# Загрузка данных из JSON файлов с GitHub
+# Г‡Г ГЈГ°ГіГ§ГЄГ  Г¤Г Г­Г­Г»Гµ ГЁГ§ JSON ГґГ Г©Г«Г®Гў Г± GitHub
 def load_data():
     global price_ab, price_cr
     price_ab = requests.get(PRICE_AB_URL).json()
@@ -37,12 +37,12 @@ def start(update: Update, context: CallbackContext):
 def central_market(update: Update, context: CallbackContext):
     global current_mode
     current_mode = 'cr'
-    context.bot.send_message(update.effective_chat.id, "Центральный Рынок")
+    context.bot.send_message(update.effective_chat.id, "Г–ГҐГ­ГІГ°Г Г«ГјГ­Г»Г© ГђГ»Г­Г®ГЄ")
 
 def auto_market(update: Update, context: CallbackContext):
     global current_mode
     current_mode = 'ab'
-    context.bot.send_message(update.effective_chat.id, "Авторынок")
+    context.bot.send_message(update.effective_chat.id, "ГЂГўГІГ®Г°Г»Г­Г®ГЄ")
 
 def handle_message(update: Update, context: CallbackContext):
     global current_mode
@@ -53,48 +53,48 @@ def handle_message(update: Update, context: CallbackContext):
     elif current_mode == 'ab':
         response = search_in_price_ab(message)
     else:
-        response = "Выберите режим с помощью /cr или /ab."
+        response = "Г‚Г»ГЎГҐГ°ГЁГІГҐ Г°ГҐГ¦ГЁГ¬ Г± ГЇГ®Г¬Г®Г№ГјГѕ /cr ГЁГ«ГЁ /ab."
 
     context.bot.send_message(update.effective_chat.id, response)
 
 def search_in_price_cr(query):
     results = []
     for item, details in price_cr.items():
-        if query.lower() in item.lower():  # Поиск по названию объекта
+        if query.lower() in item.lower():  # ГЏГ®ГЁГ±ГЄ ГЇГ® Г­Г Г§ГўГ Г­ГЁГѕ Г®ГЎГєГҐГЄГІГ 
             price = details['sa']['price']
-            results.append(f"Результат: {item} - цена {price}$")
-    return "\n".join(results) if results else "Совпадений не найдено."
+            results.append(f"ГђГҐГ§ГіГ«ГјГІГ ГІ: {item} - Г¶ГҐГ­Г  {price}$")
+    return "\n".join(results) if results else "Г‘Г®ГўГЇГ Г¤ГҐГ­ГЁГ© Г­ГҐ Г­Г Г©Г¤ГҐГ­Г®."
 
 def search_in_price_ab(query):
     results = []
     for item, price in price_ab.items():
-        if query.lower() in item.lower():  # Поиск по названию автомобиля
-            results.append(f"Результат: {item} - цена {price}$")
-    return "\n".join(results) if results else "Совпадений не найдено."
+        if query.lower() in item.lower():  # ГЏГ®ГЁГ±ГЄ ГЇГ® Г­Г Г§ГўГ Г­ГЁГѕ Г ГўГІГ®Г¬Г®ГЎГЁГ«Гї
+            results.append(f"ГђГҐГ§ГіГ«ГјГІГ ГІ: {item} - Г¶ГҐГ­Г  {price}$")
+    return "\n".join(results) if results else "Г‘Г®ГўГЇГ Г¤ГҐГ­ГЁГ© Г­ГҐ Г­Г Г©Г¤ГҐГ­Г®."
 
 def add_item(update: Update, context: CallbackContext):
-    context.bot.send_message(update.effective_chat.id, "Введите название:")
+    context.bot.send_message(update.effective_chat.id, "Г‚ГўГҐГ¤ГЁГІГҐ Г­Г Г§ГўГ Г­ГЁГҐ:")
     return "WAITING_FOR_NAME"
 
 def receive_name(update: Update, context: CallbackContext):
     name = update.message.text
     pending_addition['name'] = name
-    context.bot.send_message(update.effective_chat.id, "Введите цену (числом, без пробелов, точек и сокращений):")
+    context.bot.send_message(update.effective_chat.id, "Г‚ГўГҐГ¤ГЁГІГҐ Г¶ГҐГ­Гі (Г·ГЁГ±Г«Г®Г¬, ГЎГҐГ§ ГЇГ°Г®ГЎГҐГ«Г®Гў, ГІГ®Г·ГҐГЄ ГЁ Г±Г®ГЄГ°Г Г№ГҐГ­ГЁГ©):")
     return "WAITING_FOR_PRICE"
 
 def receive_price(update: Update, context: CallbackContext):
     price = update.message.text
     if price.isdigit():
         pending_addition['price'] = int(price)
-        context.bot.send_message(update.effective_chat.id, "Выберите тип:", reply_markup=type_menu())
+        context.bot.send_message(update.effective_chat.id, "Г‚Г»ГЎГҐГ°ГЁГІГҐ ГІГЁГЇ:", reply_markup=type_menu())
     else:
-        context.bot.send_message(update.effective_chat.id, "Неверный ввод. Пожалуйста, введите цену числом, без пробелов, точек и сокращений:")
+        context.bot.send_message(update.effective_chat.id, "ГЌГҐГўГҐГ°Г­Г»Г© ГўГўГ®Г¤. ГЏГ®Г¦Г Г«ГіГ©Г±ГІГ , ГўГўГҐГ¤ГЁГІГҐ Г¶ГҐГ­Гі Г·ГЁГ±Г«Г®Г¬, ГЎГҐГ§ ГЇГ°Г®ГЎГҐГ«Г®Гў, ГІГ®Г·ГҐГЄ ГЁ Г±Г®ГЄГ°Г Г№ГҐГ­ГЁГ©:")
         return "WAITING_FOR_PRICE"
 
 def type_menu():
     keyboard = [
-        [InlineKeyboardButton("Предмет", callback_data='item'),
-         InlineKeyboardButton("Транспорт", callback_data='vehicle')]
+        [InlineKeyboardButton("ГЏГ°ГҐГ¤Г¬ГҐГІ", callback_data='item'),
+         InlineKeyboardButton("Г’Г°Г Г­Г±ГЇГ®Г°ГІ", callback_data='vehicle')]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -111,15 +111,15 @@ def button_handler(update: Update, context: CallbackContext):
     elif item_type == 'vehicle':
         price_ab[name] = price
     
-    # Уведомление модератора
-    context.bot.send_message(ADMIN_CHAT_ID, f"Запрос на добавление:\nНазвание: {name}\nЦена: {price}$\nТип: {'Предмет' if item_type == 'item' else 'Транспорт'}", reply_markup=approval_menu(name, price, item_type))
+    # Г“ГўГҐГ¤Г®Г¬Г«ГҐГ­ГЁГҐ Г¬Г®Г¤ГҐГ°Г ГІГ®Г°Г 
+    context.bot.send_message(ADMIN_CHAT_ID, f"Г‡Г ГЇГ°Г®Г± Г­Г  Г¤Г®ГЎГ ГўГ«ГҐГ­ГЁГҐ:\nГЌГ Г§ГўГ Г­ГЁГҐ: {name}\nГ–ГҐГ­Г : {price}$\nГ’ГЁГЇ: {'ГЏГ°ГҐГ¤Г¬ГҐГІ' if item_type == 'item' else 'Г’Г°Г Г­Г±ГЇГ®Г°ГІ'}", reply_markup=approval_menu(name, price, item_type))
 
-    query.edit_message_text(text="Ваше предложение получило статус модерации и ждет проверки.")
+    query.edit_message_text(text="Г‚Г ГёГҐ ГЇГ°ГҐГ¤Г«Г®Г¦ГҐГ­ГЁГҐ ГЇГ®Г«ГіГ·ГЁГ«Г® Г±ГІГ ГІГіГ± Г¬Г®Г¤ГҐГ°Г Г¶ГЁГЁ ГЁ Г¦Г¤ГҐГІ ГЇГ°Г®ГўГҐГ°ГЄГЁ.")
 
 def approval_menu(name, price, item_type):
     keyboard = [
-        [InlineKeyboardButton("Принять", callback_data=f'approve_{name}_{price}_{item_type}'),
-         InlineKeyboardButton("Отклонить", callback_data=f'decline_{name}_{price}_{item_type}')]
+        [InlineKeyboardButton("ГЏГ°ГЁГ­ГїГІГј", callback_data=f'approve_{name}_{price}_{item_type}'),
+         InlineKeyboardButton("ГЋГІГЄГ«Г®Г­ГЁГІГј", callback_data=f'decline_{name}_{price}_{item_type}')]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -134,34 +134,34 @@ def moderator_response(update: Update, context: CallbackContext):
     item_type = data[3]
 
     if action == 'approve':
-        context.bot.send_message(ADMIN_CHAT_ID, f"Запрос на добавление принят: {name} - {price}$")
-        context.bot.send_message(ADMIN_CHAT_ID, "Добавлено!")
+        context.bot.send_message(ADMIN_CHAT_ID, f"Г‡Г ГЇГ°Г®Г± Г­Г  Г¤Г®ГЎГ ГўГ«ГҐГ­ГЁГҐ ГЇГ°ГЁГ­ГїГІ: {name} - {price}$")
+        context.bot.send_message(ADMIN_CHAT_ID, "Г„Г®ГЎГ ГўГ«ГҐГ­Г®!")
     elif action == 'decline':
-        context.bot.send_message(ADMIN_CHAT_ID, f"Запрос на добавление отклонен: {name} - {price}$")
-        context.bot.send_message(ADMIN_CHAT_ID, "Отклонено!")
+        context.bot.send_message(ADMIN_CHAT_ID, f"Г‡Г ГЇГ°Г®Г± Г­Г  Г¤Г®ГЎГ ГўГ«ГҐГ­ГЁГҐ Г®ГІГЄГ«Г®Г­ГҐГ­: {name} - {price}$")
+        context.bot.send_message(ADMIN_CHAT_ID, "ГЋГІГЄГ«Г®Г­ГҐГ­Г®!")
 
 def main():
     updater = Updater(TOKEN, use_context=True)
 
-    # Обработчики команд
+    # ГЋГЎГ°Г ГЎГ®ГІГ·ГЁГЄГЁ ГЄГ®Г¬Г Г­Г¤
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CommandHandler('cr', central_market))
     updater.dispatcher.add_handler(CommandHandler('ab', auto_market))
     updater.dispatcher.add_handler(CommandHandler('add', add_item))
     updater.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
     
-    # Обработчики состояний
-    updater.dispatcher.add_handler(MessageHandler(Filters.regex('^Введите название:$'), receive_name))
-    updater.dispatcher.add_handler(MessageHandler(Filters.regex('^Введите цену $$числом, без пробелов, точек и сокращений$$:$'), receive_price))
+    # ГЋГЎГ°Г ГЎГ®ГІГ·ГЁГЄГЁ Г±Г®Г±ГІГ®ГїГ­ГЁГ©
+    updater.dispatcher.add_handler(MessageHandler(Filters.regex('^Г‚ГўГҐГ¤ГЁГІГҐ Г­Г Г§ГўГ Г­ГЁГҐ:$'), receive_name))
+    updater.dispatcher.add_handler(MessageHandler(Filters.regex('^Г‚ГўГҐГ¤ГЁГІГҐ Г¶ГҐГ­Гі $$Г·ГЁГ±Г«Г®Г¬, ГЎГҐГ§ ГЇГ°Г®ГЎГҐГ«Г®Гў, ГІГ®Г·ГҐГЄ ГЁ Г±Г®ГЄГ°Г Г№ГҐГ­ГЁГ©$$:$'), receive_price))
     
-    # Обработчик для кнопок
+    # ГЋГЎГ°Г ГЎГ®ГІГ·ГЁГЄ Г¤Г«Гї ГЄГ­Г®ГЇГ®ГЄ
     updater.dispatcher.add_handler(CallbackQueryHandler(button_handler, pattern='^(item|vehicle)$'))
     updater.dispatcher.add_handler(CallbackQueryHandler(moderator_response, pattern='^(approve|decline)_'))
 
-    # Запуск бота
+    # Г‡Г ГЇГіГ±ГЄ ГЎГ®ГІГ 
     updater.start_polling()
 
-    # Ожидаем завершения работы
+    # ГЋГ¦ГЁГ¤Г ГҐГ¬ Г§Г ГўГҐГ°ГёГҐГ­ГЁГї Г°Г ГЎГ®ГІГ»
     updater.idle()
 
 if __name__ == '__main__':
